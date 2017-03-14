@@ -10,6 +10,7 @@ from scipy import stats
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+from sklearn.linear_model import Lasso
 
 ## Function to standardize a given column
 def std_score(x):
@@ -34,20 +35,33 @@ id_vars = ['id', 'school_name', 'school_city', 'school_state',
 'region', 'public']
 y_var = 'log_earnings_10yr'
 discrete_vars = ['region_high_inc', 'urban_area']
+# features for model
 cont_vars = ['score_sat_act', 'female_pct', 'born_in_usa_pct', 
-'pell_grant_pct', 'enrollment']
+'pell_grant_pct', 'enrollment', 'overage23']
+# available features
+cont_vars_lasso = ['score_sat_act', 'female_pct', 'born_in_usa_pct', 
+'pell_grant_pct', 'enrollment', 'overage23', 'median_hh_income',
+'black_or_hispanic_pct', 'pct_college_degree']
 
-## Columns needed for model
-dfmod = df[id_vars + [y_var] + cont_vars + discrete_vars].copy()
-print(dfmod.shape)
+## Columns needed for lasso regression
+dflasso = df[id_vars + [y_var] + cont_vars_lasso + discrete_vars].copy()
 
 ## Standardize continuous columns 
-for var in cont_vars:
-    dfmod[var] = std_score(dfmod[var])
+for var in cont_vars_lasso:
+    dflasso[var] = std_score(dflasso[var])
+
+## Columns needed for model
+dfmod = dflasso[id_vars + [y_var] + cont_vars + discrete_vars].copy()
+
+plt.hist(dfmod[y_var], 50)
+plt.savefig('./plots/y_var_hist.png')
 
 ## Features and dependent variable
+y_lasso = dflasso[y_var]
+X_lasso = dflasso.drop(id_vars + [y_var], 1)
 y = dfmod[y_var]
 X = dfmod.drop(id_vars + [y_var], 1)
+
 ## Check for multicollinearity 
 vif = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
 n = 0
@@ -55,6 +69,33 @@ print('variance inflation factors')
 for x in X.columns:
     print(x, vif[n].round(3))
     n += 1
+
+## Lasso Regression
+def lasso(y_col, x_cols, alphas):
+    '''
+    Takes in a list of alphas. Outputs a dataframe containing the coefficients of lasso regressions from each alpha.
+    Adapted from Chris Albon http://chrisalbon.com/machine-learning/lasso_regression_in_scikit.html
+    '''
+    # Create an empty data frame
+    df = pd.DataFrame()
+    # Create a column of feature names
+    df['Feature Name'] = list(x_cols.columns)
+    # For each alpha value in the list of alpha values,
+    for alpha in alphas:
+        # Create a lasso regression with that alpha value,
+        lasso = Lasso(alpha = alpha)
+        # Fit the lasso regression
+        lasso.fit(x_cols, y_col)
+        # Create a column name for that alpha value
+        column_name = 'Alpha = %f' % alpha
+        # Create a column of coefficient values
+        df[column_name] = lasso.coef_
+    # Return the datafram    
+    return df
+
+## Use lasso regression to inform model feature selection
+lasso_results = lasso(y, X_lasso, [.0001, .005, .01])
+print(lasso_results)
 
 ## Cross validation
 # Create a fold object to organize cross validation
@@ -106,7 +147,8 @@ print('Train R2 =', round(train_r2, 3))
 print('Test R2 =', round(test_r2, 3))
 
 ## Plot of model residuals 
-est.resid.plot(style = 'o').get_figure().savefig('./plots/resid.png')
+#est.resid.plot(style = 'o', ylim = [-4, 4]).get_figure().savefig('./plots/resid.png')
+dfmod['resid'] = est.resid
 
 ## Get predicted values
 dfmod['pred_ols'] = est.predict(X)
@@ -117,6 +159,11 @@ dfmod = pd.merge(dfmod, df[['id', 'earnings_10yr']], on = 'id')
 dfmod['diff_ols'] = dfmod['log_earnings_10yr'] - dfmod['pred_ols']
 print(dfmod['diff_ols'].describe().round(2))
 dfmod['pred_earnings_10yr_ols'] = np.exp(dfmod['pred_ols'])
+
+# print(dfmod[['school_name', 'resid', 'diff_ols']])
+
+plt.hist(dfmod['diff_ols'], 50)
+plt.savefig('./plots/resid_hist.png')
 
 ## Plot of predicted versus real 10 year income
 def make_scatter(df, var1, var2, labx, laby):

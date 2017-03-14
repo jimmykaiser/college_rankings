@@ -22,45 +22,46 @@ Student demographic characteristics for the pooled 2000-01 and 2001-02 cohort ar
 ```
                             OLS Regression Results                            
 ==============================================================================
-Dep. Variable:      log_earnings_10yr   R-squared:                       0.681
-Model:                            OLS   Adj. R-squared:                  0.678
-Method:                 Least Squares   F-statistic:                     260.5
-Date:                Sun, 05 Feb 2017   Prob (F-statistic):          4.47e-207
-Time:                        10:21:56   Log-Likelihood:                 672.56
-No. Observations:                 863   AIC:                            -1329.
-Df Residuals:                     855   BIC:                            -1291.
-Df Model:                           7                                         
+Dep. Variable:      log_earnings_10yr   R-squared:                       0.707
+Model:                            OLS   Adj. R-squared:                  0.705
+Method:                 Least Squares   F-statistic:                     258.1
+Date:                Tue, 14 Mar 2017   Prob (F-statistic):          5.94e-222
+Time:                        18:10:19   Log-Likelihood:                 711.40
+No. Observations:                 863   AIC:                            -1405.
+Df Residuals:                     854   BIC:                            -1362.
+Df Model:                           8                                         
 Covariance Type:            nonrobust                                         
 ===================================================================================
                       coef    std err          t      P>|t|      [95.0% Conf. Int.]
 -----------------------------------------------------------------------------------
-score_sat_act       0.0552      0.005     10.062      0.000         0.044     0.066
-female_pct         -0.0409      0.004     -9.679      0.000        -0.049    -0.033
-born_in_usa_pct    -0.0615      0.005    -12.355      0.000        -0.071    -0.052
-pell_grant_pct     -0.0758      0.006    -13.358      0.000        -0.087    -0.065
-enrollment          0.0224      0.004      5.314      0.000         0.014     0.031
-region_high_inc     0.0476      0.010      4.880      0.000         0.028     0.067
-urban_area          0.0339      0.010      3.408      0.001         0.014     0.053
-intercept          10.6238      0.009   1156.282      0.000        10.606    10.642
+score_sat_act       0.0628      0.005     11.773      0.000         0.052     0.073
+female_pct         -0.0510      0.004    -11.937      0.000        -0.059    -0.043
+born_in_usa_pct    -0.0572      0.005    -12.047      0.000        -0.067    -0.048
+pell_grant_pct     -0.0849      0.006    -15.378      0.000        -0.096    -0.074
+enrollment          0.0258      0.004      6.315      0.000         0.018     0.034
+overage23           0.0360      0.004      8.388      0.000         0.028     0.044
+region_high_inc     0.0559      0.009      5.991      0.000         0.038     0.074
+urban_area          0.0251      0.010      2.624      0.009         0.006     0.044
+intercept          10.6264      0.009   1204.571      0.000        10.609    10.644
 ==============================================================================
-Omnibus:                       75.541   Durbin-Watson:                   1.938
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):              296.044
-Skew:                          -0.315   Prob(JB):                     5.19e-65
-Kurtosis:                       5.799   Cond. No.                         4.92
+Omnibus:                       92.981   Durbin-Watson:                   1.908
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              398.425
+Skew:                          -0.405   Prob(JB):                     3.04e-87
+Kurtosis:                       6.229   Cond. No.                         5.35
 ==============================================================================
 ```
 
-The project uses a linear regression model to predict each school's cohort earnings after ten years. Model variables are statistically significant and account for 68% of the variation in logged median income after ten years. The regression specification is validated using [k-fold cross-validation](http://scikit-learn.org/stable/modules/cross_validation.html#k-fold). The model explains 70% of the variation in outcomes in the test data set. School ratings and ranks are based on the premise that school quality is reflected in the extent to which students in the ten-year cohort outperform their expected earnings. The residual of predicted average earnings subtracted from actual median logged earnings is standardized to produce a score for each school. Schools with a score of 1.5 and above are given a rating of 5, 0.5 and above are given 4, and between -0.5 and 0.5 earn a 3. Schools below -0.5 receive a rating of 2 and below -1.5 receive a 1. These ratings are constructed so that about half of schools earn a 3, indicating that they more or less meet expectations according to the model.
+The project uses a linear regression model to predict each school's cohort earnings after ten years. Model variables are statistically significant and account for 71% of the variation in logged median income after ten years. The regression specification is validated using [k-fold cross-validation](http://scikit-learn.org/stable/modules/cross_validation.html#k-fold). School ratings and ranks are based on the premise that school quality is reflected in the extent to which students in the ten-year cohort outperform their expected earnings. The residual of predicted average earnings subtracted from actual median logged earnings is standardized to produce a score for each school. Schools with a score of 1.5 and above are given a rating of 5, 0.5 and above are given 4, and between -0.5 and 0.5 earn a 3. Schools below -0.5 receive a rating of 2 and below -1.5 receive a 1. These ratings are constructed so that about half of schools earn a 3, indicating that they more or less meet expectations according to the model.
 
 ### Results
 
-The 68 colleges with the highest rating (5) have the highest SAT and ACT scores, the highest census tract median household income, and the lowest percentage Pell Grant recipients. Their net price is higher than average, and they have the lowest admission rate and highest completion rate on average. These colleges' average predicted earnings are $47,551, versus $60,009 actual earnings. 
+The 64 colleges with the highest rating (5) have the highest SAT and ACT scores and the highest census tract median household income. Their net price is higher than average, and they have the lowest admission rate and highest completion rate on average. These colleges' average predicted earnings are $46,790, versus $58,833 actual earnings. 
 
-Colleges with the lowest rating (1; N = 52) have above-average SAT and ACT scores, the lowest student enrollment numbers, the fewest overage students, and the highest average net price. 91% of these schools are private institutions, compared to 38% overall. These colleges' average predicted earnings are $46,456, compared to $36,171 actual. 
+Colleges with the lowest rating have above-average SAT and ACT scores, the lowest student enrollment numbers, and the highest average net price. 89% of these schools are private institutions, compared to 38% overall. These colleges' average predicted earnings are $46,014, compared to $36,207 actual. 
 
-University of Chicago, the tied for third best national university according to the 2017 _U.S. News_ rankings, receives a rating of 3 and a rank of 346, with its students outperforming predictions by $2,486 on average. University of Pennsylvania, tied for eighth place in _U.S. News_, has a rank of 54 and has a rating of 5. Its students outperform expectations by $13,216. According to the model, a U. Penn. education is higher quality than a U. Chicago one because Penn's students perform better than anticipated in the labor market. 
+University of Chicago, the tied for third best national university according to the 2017 _U.S. News_ rankings, receives a rating of 3 and a rank of 546, with its students underperforming predictions by $158 on average. University of Pennsylvania, tied for eighth place in _U.S. News_, has a rank of 89 and has a rating of 4. Its students outperform expectations by $9,970. According to the model, a U. Penn. education is higher quality than a U. Chicago one because Penn's students perform better than anticipated in the labor market. 
 
-Amherst and Williams, the top-ranked liberal arts colleges on the 2017 _U.S. News_ list, earned ratings of 2 and ranks of 835 and 870 because their students have lower earnings than expected after ten years. Nevertheless, both of these colleges are on a U.S. Dept. of Education [list](http://blog.ed.gov/2015/09/schools-with-low-costs-and-high-incomes/) of schools with low costs and high outcomes.
+Amherst and Williams, the top-ranked liberal arts colleges on the 2017 _U.S. News_ list, earned ratings of 2 and ranks of 790 and 856 because their students have lower earnings than expected after ten years. Nevertheless, both of these colleges are on a U.S. Dept. of Education [list](http://blog.ed.gov/2015/09/schools-with-low-costs-and-high-incomes/) of schools with low costs and high outcomes.
 
 ### Conclusions and Limitations
 
